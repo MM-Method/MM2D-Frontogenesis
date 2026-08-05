@@ -1,15 +1,23 @@
 # =========================================================================
 # Compiler and Flags Configuration
 # =========================================================================
+#-------- Alternative nvfortran
 #FC       =   nvfortran
 #FCFLAGS  = -O3 -tp=native #-ffree-line-length-none
-FC       =   gfortran -ffast-math -funroll-loops -flto # -fcheck-array-temporaries  -fopt-info-vec-missed 
-FCFLAGS  = -O3 -march=skylake-avx512 -ffree-line-length-none  #  -g    -fbounds-check
 
+#-------- gfortran on EPYC MILAN
+FC       =   gfortran  # -fcheck-array-temporaries  -fopt-info-vec-missed
+FCFLAGS  = -O3 -march=znver3 -O3 -ffree-line-length-none  #  -g    -fbounds-check
+
+#--------- gfortan on SKYLAKE
+#FC       =   gfortran -ffast-math -funroll-loops -flto # -fcheck-array-temporaries  -fopt-info-vec-missed 
+#FCFLAGS  = -O3 -march=skylake-avx512 -ffree-line-length-none  #  -g    -fbounds-check
+
+#---------- ifort or ifx SKYLAKE
 #FC       =   ifort
-#FCFLAGS  =    -O3      -xCORE-AVX512 -qopt-zmm-usage=high  #-traceback -O2 # -CB  -g -traceback #-Wall -Wextra -fcheck=all
+#FCFLAGS  =    -O3      -xCORE-AVX512 -qopt-zmm-usage=high  
 
-# gfortran option -fcheck=bounds -g -fbacktrace
+
 # =========================================================================
 # Files and Targets
 # =========================================================================

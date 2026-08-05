@@ -1,0 +1,20 @@
+7
+272
+0.4
+1.0,1e-15
+3.3
+gauss
+rk4
+mmex8
+NC4
+
+!   open(newunit=iu, file=fname, status='old', action='read')
+!   read(iu,*) ng
+!   read(iu,*) ncell
+!   read(iu,*) cfl
+!   read(iu,*) u, K_diff
+!   read(iu,*) t_final
+!   read(iu,'(A)') scase
+!   read(iu,'(A)') method implicit_euler euler rk4 rk5 rk7
+!   read(iu,'(A)') scheme
+!   read(iu,'(A)') METHNCs

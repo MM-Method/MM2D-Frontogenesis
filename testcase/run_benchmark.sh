@@ -4,8 +4,14 @@
 set -e
 
 # Store the absolute path to the executable and template
-PROGRAM="$(pwd)/../MMM_1Dconvect"
+PROGRAM="/home/ahokpunn/multimoment/github/MM2D-main/MMM_1Dconvect"
 TEMPLATE="$(pwd)/setup.templ"
+ 
+COREperChiplet=8
+ 
+# Execute the array
+#"${RUN_CMD[@]}"
+
 
 # Ensure required files exist before starting
 if [ ! -f "$TEMPLATE" ]; then
@@ -33,8 +39,8 @@ GRID_POINTS=(
 ACCURACIES=("1e-2" "1e-3" "1e-4" "1e-5")
 
 # Benchmarking parameters: 8 parallel instances x 10 batches = 80 total runs per scheme
-PARALLEL_PER_BATCH=8
-NUM_BATCHES=10
+PARALLEL_PER_BATCH=16
+NUM_BATCHES=8
 
 # Pre-create output folders for each scheme
 for scheme in "${SCHEMES[@]}"; do
@@ -43,7 +49,7 @@ done
 
 echo "=========================================================="
 echo " Starting Benchmarks: Scheme-by-Scheme                    "
-echo " (8 Parallel Instances x 10 Batches = 80 Runs Per Scheme) "
+echo " (16 Parallel Instances x 10 Batches = 160 Runs Per Scheme) "
 echo "=========================================================="
 
 # 1. Outer Loop: Accuracy Levels (Runs sequentially)
@@ -93,29 +99,31 @@ for acc_idx in "${!ACCURACIES[@]}"; do
             -e "s/NMETH/$nmeth/g" \
             "$TEMPLATE" > "$scheme/setup.txt"
 
-        echo "[LAUNCHING SCHEME] $scheme ($accuracy) -> Running 80 instances across $NUM_BATCHES batches..."
+        echo "[LAUNCHING SCHEME] $scheme ($accuracy) -> Running 160 instances across $NUM_BATCHES batches..."
 
         # 3. Inner Loop: Batches (1 to 10)
         for batch in $(seq 1 $NUM_BATCHES); do
 
             # Launch 8 parallel instances in the background for this batch
             for inst in $(seq 1 $PARALLEL_PER_BATCH); do
-                # Unique run number from 1 to 80
+                # Unique run number from 1 to 160
                 run_num=$(( (batch - 1) * PARALLEL_PER_BATCH + inst ))
+
+                core=$((COREperChiplet * (inst-1)  ))
 
                 (
                     cd "$scheme"
                     log_file="run${run_num}_${accuracy}_grd${grdpoint}.txt"
-                    "$PROGRAM" > "$log_file" 2>&1
+                    taskset -c $core $PROGRAM  > $log_file 2>&1
                 ) &  # <-- Spawns process in background
             done
 
-            # Wait for all 8 background instances in this batch to complete
+            # Wait for all 16 background instances in this batch to complete
             wait
 
         done
 
-        echo "[FINISHED SCHEME] $scheme for $accuracy (80 output files generated)."
+        echo "[FINISHED SCHEME] $scheme for $accuracy (160 output files generated)."
 
     done
 

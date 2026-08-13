@@ -6,7 +6,6 @@ set -e
 # Store the absolute path to the executable and template
 PROGRAM="/home/ahokpunn/multimoment/github/MM2D-main/MMM_1Dconvect"
 TEMPLATE="$(pwd)/setup.templ"
-#RUN_CMD="../sruncmd.sh"
 COREperChiplet=8
 
 
@@ -98,7 +97,7 @@ sed \
 
 echo "[LAUNCHING SCHEME] $scheme ($accuracy) -> Running 160 instances across $NUM_BATCHES batches..."
 
-# 3. Inner Loop: Batches (1 to 8)
+# 3. Inner Loop: Batches (1 to 16)
 for batch in $(seq 1 $NUM_BATCHES); do
 
 # Launch 8 parallel instances in the background for this batch
